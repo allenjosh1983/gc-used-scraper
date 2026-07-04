@@ -1,0 +1,20 @@
+[Unit]
+Description=GC Used Gear Scraper Dashboard
+After=network.target
+
+[Service]
+Type=simple
+User=YOUR_LINUX_USER
+Group=YOUR_LINUX_USER
+WorkingDirectory=/home/YOUR_LINUX_USER/gc-used-scraper
+Environment=GC_DASHBOARD_PORT=8765
+ExecStart=/home/YOUR_LINUX_USER/gc-used-scraper/.venv/bin/python dashboard/server.py --host 127.0.0.1 --port 8765
+Restart=on-failure
+RestartSec=5
+
+# Hardening (optional; remove lines that break your setup)
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

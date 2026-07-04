@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GC Used Gear — Dashboard</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="brand">
+      <h1>GC Used Gear</h1>
+      <p class="tagline">Local scrape viewer</p>
+    </div>
+    <div class="meta" id="meta-bar">
+      <span id="stat-count">—</span>
+      <span class="sep">·</span>
+      <span id="stat-updated">—</span>
+      <span class="sep">·</span>
+      <span id="stat-runs">—</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel stats-panel" id="stats-panel" hidden>
+      <div class="stats-grid" id="stats-grid"></div>
+      <details class="run-history">
+        <summary>Run history</summary>
+        <ul id="run-history-list"></ul>
+      </details>
+    </section>
+
+    <section class="panel controls">
+      <div class="row">
+        <label>
+          Date
+          <select id="date-select" aria-label="Scrape date"></select>
+        </label>
+        <label>
+          Dataset
+          <select id="source-select" aria-label="Dataset source"></select>
+        </label>
+      </div>
+
+      <div class="row filters">
+        <label class="grow">
+          Search
+          <input type="search" id="filter-search" placeholder="Title, brand, store…" autocomplete="off" />
+        </label>
+        <label>
+          Min $
+          <input type="number" id="filter-min-price" min="0" step="1" placeholder="0" />
+        </label>
+        <label>
+          Max $
+          <input type="number" id="filter-max-price" min="0" step="1" placeholder="∞" />
+        </label>
+        <label>
+          Min % off
+          <input type="number" id="filter-min-discount" min="0" max="100" step="1" placeholder="0" />
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" id="filter-price-drop" />
+          Price drop only
+        </label>
+        <button type="button" id="btn-reset" class="btn secondary">Reset filters</button>
+      </div>
+    </section>
+
+    <section class="panel table-wrap">
+      <p id="status" class="status" role="status">Loading…</p>
+      <div class="table-scroll">
+        <table id="listings-table">
+          <thead>
+            <tr>
+              <th data-sort="title">Title</th>
+              <th data-sort="brand">Brand</th>
+              <th data-sort="price">Price</th>
+              <th data-sort="list_price">List</th>
+              <th data-sort="discount_percent">% off</th>
+              <th data-sort="condition">Condition</th>
+              <th data-sort="store">Store</th>
+              <th data-sort="created_at">Listed</th>
+            </tr>
+          </thead>
+          <tbody id="listings-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Click a row to open the Guitar Center listing. Data from <code>output/daily/</code>.</p>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

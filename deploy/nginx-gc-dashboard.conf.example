@@ -1,0 +1,80 @@
+# Nginx site for GC Used Gear dashboard
+# 1. Copy to /etc/nginx/sites-available/gc-dashboard
+# 2. Replace YOUR_DOMAIN_OR_IP, paths, and auth file location
+# 3. sudo ln -s /etc/nginx/sites-available/gc-dashboard /etc/nginx/sites-enabled/
+# 4. sudo nginx -t && sudo systemctl reload nginx
+#
+# Create HTTP basic auth (recommended for partner access):
+#   sudo apt install -y apache2-utils
+#   sudo htpasswd -c /etc/nginx/.htpasswd-gc-dashboard partner_username
+
+upstream gc_dashboard {
+    server 127.0.0.1:8765;
+    keepalive 8;
+}
+
+# --- Option A: Domain with HTTPS (recommended) ---
+# After DNS points to your VPS:
+#   sudo apt install -y certbot python3-certbot-nginx
+#   sudo certbot --nginx -d YOUR_DOMAIN
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name YOUR_DOMAIN;
+
+    # Certbot will add redirect to HTTPS; until then, proxy HTTP:
+    location / {
+        auth_basic "GC Used Gear Dashboard";
+        auth_basic_user_file /etc/nginx/.htpasswd-gc-dashboard;
+
+        proxy_pass http://gc_dashboard;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# Uncomment after certbot creates SSL server block, or merge auth into certbot's server {}
+# server {
+#     listen 443 ssl http2;
+#     listen [::]:443 ssl http2;
+#     server_name YOUR_DOMAIN;
+#     ssl_certificate /etc/letsencrypt/live/YOUR_DOMAIN/fullchain.pem;
+#     ssl_certificate_key /etc/letsencrypt/live/YOUR_DOMAIN/privkey.pem;
+#
+#     location / {
+#         auth_basic "GC Used Gear Dashboard";
+#         auth_basic_user_file /etc/nginx/.htpasswd-gc-dashboard;
+#         proxy_pass http://gc_dashboard;
+#         proxy_http_version 1.1;
+#         proxy_set_header Host $host;
+#         proxy_set_header X-Real-IP $remote_addr;
+#         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#         proxy_set_header X-Forwarded-Proto $scheme;
+#     }
+# }
+
+# --- Option B: IP-only (no domain) — HTTP on port 80 ---
+# Use this block instead of the domain block above if you only have a VPS IP.
+# Partner opens: http://YOUR_VPS_IP/  (username/password from htpasswd)
+
+# server {
+#     listen 80 default_server;
+#     listen [::]:80 default_server;
+#     server_name _;
+#
+#     location / {
+#         auth_basic "GC Used Gear Dashboard";
+#         auth_basic_user_file /etc/nginx/.htpasswd-gc-dashboard;
+#
+#         proxy_pass http://gc_dashboard;
+#         proxy_http_version 1.1;
+#         proxy_set_header Host $host;
+#         proxy_set_header X-Real-IP $remote_addr;
+#         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#         proxy_set_header X-Forwarded-Proto $scheme;
+#     }
+# }
